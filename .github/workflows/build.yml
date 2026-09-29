@@ -1,0 +1,48 @@
+
+name: Build Slow Hands Mod
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "SlowHands-Fabric-1.21.11-project.zip"
+      - ".github/workflows/build.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Gradle 9.2.1
+        run: |
+          curl -L https://services.gradle.org/distributions/gradle-9.2.1-bin.zip -o gradle.zip
+          unzip -q gradle.zip -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-9.2.1/bin" >> "$GITHUB_PATH"
+
+      - name: Extract mod project
+        run: |
+          unzip -q SlowHands-Fabric-1.21.11-project.zip
+
+      - name: Build mod JAR
+        run: |
+          cd SlowHands-Fabric-1.21.11
+          gradle --no-daemon build
+          mkdir -p output
+          cp build/libs/slowhands-1.0.0.jar output/
+
+      - name: Upload compiled JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlowHands-Fabric-1.21.11
+          path: SlowHands-Fabric-1.21.11/output/slowhands-1.0.0.jar
+          if-no-files-found: error
+          retention-days: 30

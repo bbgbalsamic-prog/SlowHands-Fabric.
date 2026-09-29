@@ -32,6 +32,10 @@ jobs:
         run: |
           unzip -q SlowHands-Fabric-1.21.11-project.zip
 
+      - name: Fix Fabric Loom configuration
+        run: |
+          sed -i "s/net.fabricmc.fabric-loom'/net.fabricmc.fabric-loom-remap'/" SlowHands-Fabric-1.21.11/build.gradle
+
       - name: Build mod JAR
         run: |
           cd SlowHands-Fabric-1.21.11
